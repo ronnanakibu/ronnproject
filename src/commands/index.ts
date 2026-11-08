@@ -6,6 +6,7 @@ import { contactCommand } from './contact.js';
 import { openCommand } from './open.js';
 import { themeCommand } from './theme.js';
 import { clearCommand } from './clear.js';
+import { driveCommand } from './drive.js';
 
 const allCommands: Command[] = [
   helpCommand,
@@ -15,6 +16,7 @@ const allCommands: Command[] = [
   openCommand,
   themeCommand,
   clearCommand,
+  driveCommand,
 ];
 
 // Map from name/alias -> Command for O(1) lookup

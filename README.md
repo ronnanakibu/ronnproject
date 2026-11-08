@@ -151,3 +151,4 @@ Theme tokens live in `src/styles/tokens.css`. Both themes (`paper` and `ember`) 
   - Screen reader announcements via dynamic `aria-live="polite"` region.
   - Automatic `prefers-reduced-motion` detection (disables cursor blink and all transitions).
 - **No-JS Fallback**: Search crawlers and users with JS disabled receive clean semantic HTML listing all projects and contact links.
+

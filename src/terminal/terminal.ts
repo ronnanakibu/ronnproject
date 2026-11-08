@@ -3,6 +3,7 @@ import { parseCommand } from './parser.js';
 import { History } from './history.js';
 import { complete } from './complete.js';
 import { renderBlock } from './render.js';
+import { ScreensaverEngine } from './screensaver.js';
 import { getCommand, getCommandMap, getCommandNames } from '../commands/index.js';
 
 const VALID_THEMES = ['paper', 'ember'] as const;
@@ -54,6 +55,7 @@ export function mountTerminal(root: HTMLElement): void {
   const history = new History();
   const commandMap = getCommandMap();
   const commandNames = getCommandNames();
+  const screensaver = new ScreensaverEngine(15); // 15s idle timer
 
   // === Query DOM elements ===
   const terminalBody = root.querySelector<HTMLElement>('.terminal-body');
@@ -110,10 +112,15 @@ export function mountTerminal(root: HTMLElement): void {
       outputArea.appendChild(fragment);
       scrollToBottom();
     },
+
+    startScreensaver(): void {
+      screensaver.start();
+    },
   };
 
   // === Execute a command string ===
   function executeCommand(input: string): void {
+    screensaver.resetIdleTimer();
     const parsed = parseCommand(input);
     if (!parsed) return;
 

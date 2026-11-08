@@ -11,6 +11,7 @@ describe('Command Registry', () => {
     expect(names).toContain('open');
     expect(names).toContain('theme');
     expect(names).toContain('clear');
+    expect(names).toContain('drive');
   });
 
   it('looks up commands by name', () => {

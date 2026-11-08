@@ -56,6 +56,7 @@ export interface Context {
   setTheme(name: string): void;
   clearOutput(): void;
   print(blocks: OutputBlock | OutputBlock[]): void;
+  startScreensaver?(): void;
 }
 
 export interface Command {
