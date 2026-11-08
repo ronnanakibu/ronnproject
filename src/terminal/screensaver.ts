@@ -1,14 +1,9 @@
 /**
- * Retro-Arcade 3D Forza Cinematic Screensaver
- * Procedural High-Visibility Low-Poly Sports Car & Endless Cyber Highway.
- * Ultra-lightweight: Zero external 3D libraries, ~4KB footprint, locked 60 FPS.
+ * Retro-Arcade 3D Forza Cinematic Screensaver (Attract Mode)
+ * High-performance, pixel-perfect procedural racer engine.
+ * Inspired by OutRun, Horizon Chase & Forza attract reels.
+ * Ultra-lightweight: zero external 3D libraries, locked 60 FPS.
  */
-
-interface Point3D {
-  x: number;
-  y: number;
-  z: number;
-}
 
 export class ScreensaverEngine {
   private overlay: HTMLElement;
@@ -22,19 +17,21 @@ export class ScreensaverEngine {
   private hudRpm: HTMLElement | null = null;
   private hudGear: HTMLElement | null = null;
 
-  // Cinematic scene state
+  // Cinematic state
   private time = 0;
-  private camAngle = 0; // Current camera view (0..3)
-  private camTimer = 0;
-  private currentSpeed = 242;
+  private speed = 246;
   private targetSpeed = 255;
   private rpm = 7600;
   private gear = 5;
+  private carX = 0; // Lateral steering (-1..1)
+  private carTargetX = 0;
+  private steerTimer = 0;
+  private camMode = 0; // 0: Chase, 1: Low tarmac, 2: Sweeping curve
+  private camTimer = 0;
 
   constructor(idleSeconds = 20) {
     this.idleTimeMs = idleSeconds * 1000;
 
-    // Create or select overlay DOM
     let existingOverlay = document.getElementById('screensaver');
     if (!existingOverlay) {
       existingOverlay = document.createElement('div');
@@ -49,7 +46,7 @@ export class ScreensaverEngine {
           <div class="screensaver-telemetry">
             <span class="hud-tag">RONN MOTORS // 3D FORZA ATTRACT MODE</span>
             <span class="hud-stats">
-              SPEED: <span id="hud-speed">242</span> KM/H ·
+              SPEED: <span id="hud-speed">246</span> KM/H ·
               RPM: <span id="hud-rpm">7600</span> ·
               GEAR: <span id="hud-gear">5</span>
             </span>
@@ -125,7 +122,7 @@ export class ScreensaverEngine {
 
     this.resizeCanvas();
     this.time = 0;
-    this.camAngle = 0;
+    this.camMode = 0;
     this.camTimer = 0;
     this.loop();
   }
@@ -164,21 +161,29 @@ export class ScreensaverEngine {
 
     this.time += 0.016;
     this.camTimer += 0.016;
+    this.steerTimer += 0.016;
 
-    // Switch Forza cinematic camera angle every 6 seconds
-    if (this.camTimer > 6) {
+    // Switch camera perspective every 7 seconds
+    if (this.camTimer > 7) {
       this.camTimer = 0;
-      this.camAngle = (this.camAngle + 1) % 4;
-      this.targetSpeed = 225 + Math.random() * 45;
+      this.camMode = (this.camMode + 1) % 3;
+      this.targetSpeed = 230 + Math.random() * 40;
     }
 
-    // Telemetry physics
-    this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.02;
-    this.rpm = Math.floor(6400 + ((this.currentSpeed - 220) / 50) * 1800 + Math.sin(this.time * 24) * 90);
-    this.gear = this.currentSpeed > 245 ? 6 : 5;
+    // Gentle lane weaving (car drifting smoothly across highway lanes)
+    if (this.steerTimer > 3.5) {
+      this.steerTimer = 0;
+      this.carTargetX = (Math.random() - 0.5) * 0.7;
+    }
+    this.carX += (this.carTargetX - this.carX) * 0.04;
 
-    if (this.hudSpeed && Math.floor(this.time * 60) % 6 === 0) {
-      this.hudSpeed.textContent = Math.floor(this.currentSpeed).toString();
+    // Physics simulation
+    this.speed += (this.targetSpeed - this.speed) * 0.02;
+    this.rpm = Math.floor(6600 + ((this.speed - 220) / 50) * 1600 + Math.sin(this.time * 30) * 100);
+    this.gear = this.speed > 248 ? 6 : 5;
+
+    if (this.hudSpeed && Math.floor(this.time * 60) % 5 === 0) {
+      this.hudSpeed.textContent = Math.floor(this.speed).toString();
       if (this.hudRpm) this.hudRpm.textContent = this.rpm.toString();
       if (this.hudGear) this.hudGear.textContent = this.gear.toString();
     }
@@ -192,57 +197,57 @@ export class ScreensaverEngine {
     const w = this.canvas.width;
     const h = this.canvas.height;
     const cx = w / 2;
-    const cy = h * 0.42; // Horizon
+    const cy = h * 0.42; // Horizon line
     const isEmber = document.documentElement.dataset['theme'] === 'ember';
 
-    // Theme palette
-    const colSkyTop = isEmber ? '#0d0704' : '#080811';
-    const colSkyBottom = isEmber ? '#2b1206' : '#14142b';
-    const colRoad = isEmber ? '#140c08' : '#0a0a10';
-    const colGrid = isEmber ? '#9c4415' : '#2430ff';
-    const colAccent = isEmber ? '#ff7a29' : '#3d4aff';
-    const colCarBody = isEmber ? '#ff6614' : '#e6e8eb';
-    const colCarShadow = isEmber ? '#9e3a06' : '#88909c';
-    const colCockpit = '#070b12';
-    const colGlass = isEmber ? '#00f5ff' : '#69b4ff';
-    const colTail = '#ff1e38';
+    // Color theme
+    const colSkyTop = isEmber ? '#090503' : '#05060f';
+    const colSkyBottom = isEmber ? '#260e05' : '#14142b';
+    const colRoad = isEmber ? '#130c08' : '#0a0a12';
+    const colRoadLine = isEmber ? '#ff8c3a' : '#2430ff';
+    const colCurbA = isEmber ? '#e03a14' : '#ff2255';
+    const colCurbB = isEmber ? '#f2f0ea' : '#ffffff';
+    const colSunA = isEmber ? '#ffb03a' : '#c966ff';
+    const colSunB = isEmber ? '#ff5214' : '#2430ff';
+    const colCarBody = isEmber ? '#ff6a1a' : '#2430ff';
+    const colCarTrim = isEmber ? '#1a0c06' : '#0c0d17';
 
-    // 1. Sky Gradient
+    // 1. Sky & Dusk Horizon
     const skyGrad = ctx.createLinearGradient(0, 0, 0, cy);
     skyGrad.addColorStop(0, colSkyTop);
     skyGrad.addColorStop(1, colSkyBottom);
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, w, cy);
 
-    // 2. Retro Neon Sun / Horizon Blind
-    const sunRadius = Math.min(w * 0.18, 120);
-    const sunGrad = ctx.createLinearGradient(0, cy - sunRadius, 0, cy);
-    sunGrad.addColorStop(0, isEmber ? '#ffae33' : '#a26bff');
-    sunGrad.addColorStop(1, colAccent);
+    // 2. Giant Retro Sun with Horizontal Blinds
+    const sunR = Math.min(w * 0.18, 130);
+    const sunGrad = ctx.createLinearGradient(0, cy - sunR, 0, cy);
+    sunGrad.addColorStop(0, colSunA);
+    sunGrad.addColorStop(1, colSunB);
 
     ctx.fillStyle = sunGrad;
     ctx.beginPath();
-    ctx.arc(cx, cy, sunRadius, Math.PI, 0, false);
+    ctx.arc(cx, cy, sunR, Math.PI, 0, false);
     ctx.fill();
 
-    // Horizontal blinds on sun
+    // Sun horizontal scanline blinds
     ctx.fillStyle = colSkyBottom;
     for (let i = 0; i < 7; i++) {
-      const bh = 3 + i * 2;
-      const by = cy - sunRadius * 0.75 + i * 14;
-      if (by < cy) {
-        ctx.fillRect(cx - sunRadius, by, sunRadius * 2, bh);
+      const barH = 2.5 + i * 2;
+      const barY = cy - sunR * 0.72 + i * 15;
+      if (barY < cy) {
+        ctx.fillRect(cx - sunR, barY, sunR * 2, barH);
       }
     }
 
-    // Distant mountain skyline
-    ctx.fillStyle = isEmber ? '#1a0b05' : '#10101c';
+    // Distant mountain silhouette
+    ctx.fillStyle = isEmber ? '#180a05' : '#0e101c';
     ctx.beginPath();
     ctx.moveTo(0, cy);
-    const peaks = [0.08, 0.2, 0.32, 0.46, 0.6, 0.74, 0.88, 1.0];
+    const peaks = [0.08, 0.22, 0.35, 0.48, 0.62, 0.75, 0.88, 1.0];
     peaks.forEach((pct, i) => {
       const px = w * pct;
-      const ph = (Math.sin(i * 1.8) * 0.5 + 0.5) * 55 + 25;
+      const ph = (Math.sin(i * 1.7) * 0.5 + 0.5) * 50 + 20;
       ctx.lineTo(px - w * 0.05, cy - ph);
       ctx.lineTo(px, cy);
     });
@@ -250,405 +255,347 @@ export class ScreensaverEngine {
     ctx.closePath();
     ctx.fill();
 
-    // 3. Ground / Highway Plane
+    // 3. Ground / Road Tarmac Plane
     ctx.fillStyle = colRoad;
     ctx.fillRect(0, cy, w, h - cy);
 
-    // Speed lines & perspective grid
-    const roadWidth = w * 0.9;
-    const fov = 380;
-    const speedOffset = (this.time * this.currentSpeed * 1.2) % 60;
+    // 4. Perspective Highway with Curves & Speed Markers
+    const roadWidth = w * 0.85;
+    const curveAmount = Math.sin(this.time * 0.8) * 90;
+    const speedPos = (this.time * this.speed * 1.5) % 100;
 
-    // Perspective Highway Borders
-    ctx.strokeStyle = colGrid;
-    ctx.lineWidth = 2.5;
+    // Render road slices from horizon down to bottom
+    const slices = 40;
+    for (let i = 0; i < slices; i++) {
+      const p1 = i / slices;
+      const p2 = (i + 1) / slices;
 
-    ctx.beginPath();
-    // Center dashed divider
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx, h);
+      const y1 = cy + p1 * p1 * (h - cy);
+      const y2 = cy + p2 * p2 * (h - cy);
 
-    // Outer road borders
-    ctx.moveTo(cx - 30, cy);
-    ctx.lineTo(cx - roadWidth, h);
-    ctx.moveTo(cx + 30, cy);
-    ctx.lineTo(cx + roadWidth, h);
-    ctx.stroke();
+      const curveOffset1 = curveAmount * p1 * p1;
+      const curveOffset2 = curveAmount * p2 * p2;
 
-    // Roadside passing light poles
-    for (let z = 30; z < 500; z += 50) {
-      const rz = (z - speedOffset + 500) % 500;
-      if (rz < 25) continue;
-      const scale = fov / rz;
-      const py = cy + scale * 50;
-      const poleH = scale * 45;
-      const pxL = cx - (roadWidth * (py - cy)) / (h - cy) - 20 * scale;
-      const pxR = cx + (roadWidth * (py - cy)) / (h - cy) + 20 * scale;
+      const w1 = roadWidth * p1 * 1.2;
+      const w2 = roadWidth * p2 * 1.2;
 
-      if (py > cy && py < h) {
-        ctx.strokeStyle = colAccent;
-        ctx.lineWidth = Math.max(1, scale * 1.8);
+      const x1L = cx + curveOffset1 - w1 / 2;
+      const x1R = cx + curveOffset1 + w1 / 2;
+      const x2L = cx + curveOffset2 - w2 / 2;
+      const x2R = cx + curveOffset2 + w2 / 2;
 
-        // Left pole
+      // Alternating curb colors (red/white rumble strips)
+      const curbAlt = Math.floor((p1 * 400 + speedPos) / 30) % 2 === 0;
+      const curbWidth1 = 20 * p1;
+      const curbWidth2 = 20 * p2;
+
+      ctx.fillStyle = curbAlt ? colCurbA : colCurbB;
+
+      // Left curb strip
+      ctx.beginPath();
+      ctx.moveTo(x1L, y1);
+      ctx.lineTo(x1L - curbWidth1, y1);
+      ctx.lineTo(x2L - curbWidth2, y2);
+      ctx.lineTo(x2L, y2);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right curb strip
+      ctx.beginPath();
+      ctx.moveTo(x1R, y1);
+      ctx.lineTo(x1R + curbWidth1, y1);
+      ctx.lineTo(x2R + curbWidth2, y2);
+      ctx.lineTo(x2R, y2);
+      ctx.closePath();
+      ctx.fill();
+
+      // Dashed lane divider markers
+      const dashAlt = Math.floor((p1 * 500 + speedPos) / 35) % 2 === 0;
+      if (dashAlt && p1 > 0.15) {
+        const laneW1 = Math.max(2, 6 * p1);
+        const laneW2 = Math.max(2, 6 * p2);
+        const laneX1 = cx + curveOffset1;
+        const laneX2 = cx + curveOffset2;
+
+        ctx.fillStyle = colRoadLine;
         ctx.beginPath();
-        ctx.moveTo(pxL, py);
-        ctx.lineTo(pxL, py - poleH);
-        ctx.stroke();
-
-        // Right pole
-        ctx.beginPath();
-        ctx.moveTo(pxR, py);
-        ctx.lineTo(pxR, py - poleH);
-        ctx.stroke();
-
-        // Neon pole lantern
-        ctx.fillStyle = isEmber ? '#ffaa33' : '#66a3ff';
-        ctx.fillRect(pxL - 3, py - poleH - 3, 6, 6);
-        ctx.fillRect(pxR - 3, py - poleH - 3, 6, 6);
+        ctx.moveTo(laneX1 - laneW1 / 2, y1);
+        ctx.lineTo(laneX1 + laneW1 / 2, y1);
+        ctx.lineTo(laneX2 + laneW2 / 2, y2);
+        ctx.lineTo(laneX2 - laneW2 / 2, y2);
+        ctx.closePath();
+        ctx.fill();
       }
     }
 
-    // Moving horizontal grid lines on asphalt
-    for (let z = 15; z < 450; z += 30) {
-      const rz = (z - speedOffset + 450) % 450;
-      if (rz < 20) continue;
-      const scale = fov / rz;
-      const py = cy + scale * 50;
-      const lx = cx - (roadWidth * (py - cy)) / (h - cy);
-      const rx = cx + (roadWidth * (py - cy)) / (h - cy);
-
-      if (py > cy && py < h) {
-        const alpha = Math.min(1, ((py - cy) / (h - cy)) * 1.4);
-        ctx.strokeStyle = `rgba(${isEmber ? '255, 122, 41' : '36, 48, 255'}, ${alpha})`;
-        ctx.lineWidth = Math.max(1, scale * 1.5);
-        ctx.beginPath();
-        ctx.moveTo(lx, py);
-        ctx.lineTo(rx, py);
-        ctx.stroke();
-      }
-    }
-
-    // 4. Render Procedural 3D Sports Car
-    this.renderCar(ctx, cx, cy, colCarBody, colCarShadow, colAccent, colCockpit, colGlass, colTail);
+    // 5. Draw Sleek Supercar (Clean, Polished, Anatomically Authentic)
+    this.drawSportsCar(ctx, cx, cy, h, isEmber, colCarBody, colCarTrim);
   }
 
-  private renderCar(
+  /**
+   * Draws a gorgeous, sleek retro-futuristic sports car (like a Porsche 911 Turbo / Countach)
+   * with authentic proportions, glowing taillights, massive wing spoiler, and spinning tires.
+   */
+  private drawSportsCar(
     ctx: CanvasRenderingContext2D,
     cx: number,
     cy: number,
-    bodyCol: string,
-    shadowCol: string,
-    accentCol: string,
-    cockpitCol: string,
-    glassCol: string,
-    tailCol: string
+    canvasH: number,
+    isEmber: boolean,
+    bodyColor: string,
+    trimColor: string
   ): void {
-    // Dynamic scale so the car is prominent across all screen sizes
-    const baseScale = Math.max(1.1, Math.min(this.canvas.width, this.canvas.height) / 480);
+    const scale = Math.min(this.canvas.width, this.canvas.height) / 600;
+    const carW = 320 * scale;
+    const carH = 110 * scale;
 
-    let camYaw = 0;
-    let camPitch = 0.16;
-    let camDist = 320;
-    let carOffsetX = 0;
-
-    switch (this.camAngle) {
-      case 0: // Rear Chase Camera
-        camYaw = Math.sin(this.time * 0.7) * 0.12;
-        camPitch = 0.16 + Math.sin(this.time * 1.4) * 0.02;
-        camDist = 300;
-        break;
-      case 1: // Side Wheel Tracking Cam
-        camYaw = 1.35 + Math.sin(this.time * 0.5) * 0.12;
-        camPitch = 0.09;
-        camDist = 320;
-        carOffsetX = 45 * baseScale;
-        break;
-      case 2: // 3/4 Front Dramatic Orbit
-        camYaw = 2.65 + Math.sin(this.time * 0.6) * 0.3;
-        camPitch = 0.17;
-        camDist = 340;
-        break;
-      case 3: // Front Head-on Charge
-        camYaw = Math.PI + Math.sin(this.time * 0.8) * 0.14;
-        camPitch = 0.12;
-        camDist = 310;
-        break;
+    // Camera placement & subtle suspension bounce
+    let posY = cy + (canvasH - cy) * 0.65;
+    if (this.camMode === 1) {
+      posY = cy + (canvasH - cy) * 0.76; // Low tarmac camera
     }
 
-    // Position car right on the highway
-    const vibY = Math.sin(this.time * 48) * 2;
-    const cyCar = cy + this.canvas.height * 0.26 + vibY;
+    const vibY = Math.sin(this.time * 45) * 1.5;
+    const bankAngle = (this.carX * 0.12) + Math.sin(this.time * 3) * 0.02; // banking into curves
 
-    // Bold Dimensions
-    const L = 160 * baseScale; // Length
-    const W = 82 * baseScale;  // Width
-    const H = 36 * baseScale;  // Body height
-    const R = 72 * baseScale;  // Roof height
+    const posX = cx + this.carX * (this.canvas.width * 0.22);
 
-    // 3D Model Vertices
-    const rawVertices: Point3D[] = [
-      // 0..3: Front Bumper & Splitter
-      { x: -W * 0.95, y: 0, z: L },
-      { x: W * 0.95, y: 0, z: L },
-      { x: -W * 0.9, y: H * 0.7, z: L * 0.9 },
-      { x: W * 0.9, y: H * 0.7, z: L * 0.9 },
+    ctx.save();
+    ctx.translate(posX, posY + vibY);
+    ctx.rotate(bankAngle);
 
-      // 4..5: Hood / Windshield base
-      { x: -W * 0.88, y: H * 0.95, z: L * 0.3 },
-      { x: W * 0.88, y: H * 0.95, z: L * 0.3 },
-
-      // 6..9: Cabin Roof
-      { x: -W * 0.68, y: R, z: -L * 0.05 },
-      { x: W * 0.68, y: R, z: -L * 0.05 },
-      { x: -W * 0.68, y: R, z: -L * 0.48 },
-      { x: W * 0.68, y: R, z: -L * 0.48 },
-
-      // 10..13: Rear Deck & Bumper
-      { x: -W * 0.9, y: H * 0.95, z: -L * 0.85 },
-      { x: W * 0.9, y: H * 0.95, z: -L * 0.85 },
-      { x: -W * 0.95, y: 0, z: -L },
-      { x: W * 0.95, y: 0, z: -L },
-
-      // 14..15: GT Spoiler Wing
-      { x: -W * 0.92, y: H + 26 * baseScale, z: -L * 0.92 },
-      { x: W * 0.92, y: H + 26 * baseScale, z: -L * 0.92 },
-
-      // 16..19: Pop-up Headlights (Left & Right)
-      { x: -W * 0.78, y: H * 0.95, z: L * 0.75 },
-      { x: -W * 0.45, y: H * 0.95, z: L * 0.75 },
-      { x: W * 0.45, y: H * 0.95, z: L * 0.75 },
-      { x: W * 0.78, y: H * 0.95, z: L * 0.75 },
-    ];
-
-    // Projection calculation
-    const cosY = Math.cos(camYaw);
-    const sinY = Math.sin(camYaw);
-    const cosP = Math.cos(camPitch);
-    const sinP = Math.sin(camPitch);
-    const fov = 420;
-
-    const projected = rawVertices.map((p) => {
-      const px = p.x + carOffsetX;
-      const py = p.y;
-      const pz = p.z;
-
-      const x1 = px * cosY - pz * sinY;
-      const z1 = px * sinY + pz * cosY;
-
-      const y2 = py * cosP - z1 * sinP;
-      const z2 = py * sinP + z1 * cosP + camDist;
-
-      const scale = fov / Math.max(10, z2);
-      return {
-        x: cx + x1 * scale,
-        y: cyCar - y2 * scale,
-        z: z2,
-        scale,
-      };
-    });
-
-    // 1. Glowing Neon Underglow on Asphalt
-    const underglowGrad = ctx.createRadialGradient(cx, cyCar + 8, 20, cx, cyCar + 8, W * 2.2);
-    underglowGrad.addColorStop(0, accentCol);
-    underglowGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = underglowGrad;
+    // A. Neon Underglow on Asphalt
+    const underglow = ctx.createRadialGradient(0, carH * 0.45, 20 * scale, 0, carH * 0.45, carW * 0.7);
+    underglow.addColorStop(0, isEmber ? 'rgba(255, 120, 20, 0.75)' : 'rgba(36, 48, 255, 0.75)');
+    underglow.addColorStop(1, 'transparent');
+    ctx.fillStyle = underglow;
     ctx.beginPath();
-    ctx.ellipse(cx, cyCar + 8, W * 2.2, 38, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, carH * 0.45, carW * 0.7, 26 * scale, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Dark chassis ground contact shadow
+    // B. Ground Contact Tire Shadows
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
     ctx.beginPath();
-    ctx.ellipse(cx, cyCar + 6, W * 1.8, 24, 0, 0, Math.PI * 2);
+    ctx.ellipse(-carW * 0.36, carH * 0.42, 38 * scale, 12 * scale, 0, 0, Math.PI * 2);
+    ctx.ellipse(carW * 0.36, carH * 0.42, 38 * scale, 12 * scale, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // 2. Polygonal Faces
-    const faces = [
-      // Front Bumper Nose
-      { idx: [0, 1, 3, 2], col: shadowCol },
-      // Hood
-      { idx: [2, 3, 5, 4], col: bodyCol },
-      // Windshield (Glass with cyan reflection)
-      { idx: [4, 5, 7, 6], col: glassCol },
-      // Roof
-      { idx: [6, 7, 9, 8], col: cockpitCol },
-      // Rear Glass
-      { idx: [8, 9, 11, 10], col: glassCol },
-      // Rear Deck / Boot
-      { idx: [10, 11, 13, 12], col: bodyCol },
-      // Left Side Body
-      { idx: [0, 2, 4, 6, 8, 10, 12], col: shadowCol },
-      // Right Side Body
-      { idx: [1, 3, 5, 7, 9, 11, 13], col: bodyCol },
-      // Rear Continuous Neon Taillight Bar
-      { idx: [10, 11, 13, 12], col: tailCol },
-    ];
+    // C. Massive Wide Racing Slicks (Left & Right Tires)
+    const tireW = 54 * scale;
+    const tireH = 75 * scale;
+    const tireY = carH * 0.1;
 
-    const sortedFaces = faces
-      .map((f) => {
-        const avgZ = f.idx.reduce((sum, i) => sum + (projected[i]?.z || 0), 0) / f.idx.length;
-        return { ...f, avgZ };
-      })
-      .sort((a, b) => b.avgZ - a.avgZ);
-
-    // Render body polygons with crisp brutalist 8-bit stroke outlines
-    for (const face of sortedFaces) {
+    [-carW * 0.38, carW * 0.38].forEach((tx) => {
+      // Outer rubber tire
+      ctx.fillStyle = '#101217';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      const first = projected[face.idx[0]!];
-      if (!first) continue;
-      ctx.moveTo(first.x, first.y);
+      ctx.roundRect(tx - tireW / 2, tireY, tireW, tireH, 8 * scale);
+      ctx.fill();
+      ctx.stroke();
 
-      for (let i = 1; i < face.idx.length; i++) {
-        const pt = projected[face.idx[i]!];
-        if (pt) ctx.lineTo(pt.x, pt.y);
-      }
-      ctx.closePath();
-
-      ctx.fillStyle = face.col;
+      // Spinning alloy rim
+      ctx.fillStyle = '#1e2430';
+      ctx.beginPath();
+      ctx.roundRect(tx - tireW * 0.35, tireY + 10 * scale, tireW * 0.7, tireH - 20 * scale, 4 * scale);
       ctx.fill();
 
-      ctx.strokeStyle = '#000000';
+      // Rim cross-spokes with rotation blur
+      ctx.strokeStyle = isEmber ? '#ff7a29' : '#00f5ff';
       ctx.lineWidth = 2.5;
-      ctx.stroke();
-    }
-
-    // 3. Render 3D Wheels (Front Left, Front Right, Rear Left, Rear Right)
-    const wheelPositions = [
-      { x: -W * 0.95, y: 16 * baseScale, z: L * 0.62 },
-      { x: W * 0.95, y: 16 * baseScale, z: L * 0.62 },
-      { x: -W * 0.95, y: 18 * baseScale, z: -L * 0.65 },
-      { x: W * 0.95, y: 18 * baseScale, z: -L * 0.65 },
-    ];
-
-    wheelPositions.forEach((wp) => {
-      const px = wp.x + carOffsetX;
-      const py = wp.y;
-      const pz = wp.z;
-
-      const x1 = px * cosY - pz * sinY;
-      const z1 = px * sinY + pz * cosY;
-      const y2 = py * cosP - z1 * sinP;
-      const z2 = py * sinP + z1 * cosP + camDist;
-
-      const scale = fov / Math.max(10, z2);
-      const wx = cx + x1 * scale;
-      const wy = cyCar - y2 * scale + 10;
-      const wr = 22 * baseScale * scale;
-
-      // Tire
-      ctx.fillStyle = '#111317';
       ctx.beginPath();
-      ctx.arc(wx, wy, wr, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Spinning Rim / Alloy Spokes
-      ctx.strokeStyle = accentCol;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(wx, wy, wr * 0.55, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Cross spokes rotating with speed
-      const rot = this.time * 30;
-      ctx.beginPath();
-      ctx.moveTo(wx + Math.cos(rot) * wr * 0.55, wy + Math.sin(rot) * wr * 0.55);
-      ctx.lineTo(wx - Math.cos(rot) * wr * 0.55, wy - Math.sin(rot) * wr * 0.55);
-      ctx.moveTo(wx + Math.cos(rot + 1.57) * wr * 0.55, wy + Math.sin(rot + 1.57) * wr * 0.55);
-      ctx.lineTo(wx - Math.cos(rot + 1.57) * wr * 0.55, wy - Math.sin(rot + 1.57) * wr * 0.55);
+      ctx.moveTo(tx, tireY + 12 * scale);
+      ctx.lineTo(tx, tireY + tireH - 12 * scale);
       ctx.stroke();
     });
 
-    // 4. Massive GT Wing Spoiler
-    const wL = projected[14];
-    const wR = projected[15];
-    const dL = projected[10];
-    const dR = projected[11];
-    if (wL && wR && dL && dR) {
-      // Struts
+    // D. Lower Rear Diffuser & Exhaust Tips
+    const diffW = carW * 0.65;
+    const diffH = 26 * scale;
+    const diffY = carH * 0.35;
+
+    ctx.fillStyle = trimColor;
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.roundRect(-diffW / 2, diffY, diffW, diffH, 4 * scale);
+    ctx.fill();
+    ctx.stroke();
+
+    // Diffuser vertical aero fins
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    for (let f = -3; f <= 3; f++) {
+      if (f === 0) continue;
+      const fx = (f * diffW) / 8;
+      ctx.beginPath();
+      ctx.moveTo(fx, diffY);
+      ctx.lineTo(fx, diffY + diffH);
+      ctx.stroke();
+    }
+
+    // Twin Quad Exhaust Pipes
+    const exhaustFlame = Math.sin(this.time * 50) * 16 * scale + 10 * scale;
+    [-diffW * 0.32, -diffW * 0.22, diffW * 0.22, diffW * 0.32].forEach((ex) => {
+      // Chrome pipe tips
+      ctx.fillStyle = '#1c202a';
+      ctx.strokeStyle = '#6a788e';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(ex, diffY + diffH * 0.6, 7 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // High-RPM blue/orange nitrous exhaust flames!
+      const flameGrad = ctx.createLinearGradient(ex, diffY + diffH * 0.8, ex, diffY + diffH * 0.8 + exhaustFlame);
+      flameGrad.addColorStop(0, '#00e1ff');
+      flameGrad.addColorStop(0.3, isEmber ? '#ff7a18' : '#6b4aff');
+      flameGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = flameGrad;
+      ctx.beginPath();
+      ctx.moveTo(ex - 4 * scale, diffY + diffH * 0.8);
+      ctx.lineTo(ex, diffY + diffH * 0.8 + exhaustFlame);
+      ctx.lineTo(ex + 4 * scale, diffY + diffH * 0.8);
+      ctx.fill();
+    });
+
+    // E. Main Rear Body Bumper & Wide Haunches
+    ctx.fillStyle = bodyColor;
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    // Start top left shoulder
+    ctx.moveTo(-carW * 0.44, carH * 0.05);
+    // Across rear deck
+    ctx.lineTo(-carW * 0.32, -carH * 0.08);
+    ctx.lineTo(carW * 0.32, -carH * 0.08);
+    ctx.lineTo(carW * 0.44, carH * 0.05);
+    // Down right fender flare
+    ctx.lineTo(carW * 0.48, carH * 0.28);
+    ctx.lineTo(carW * 0.42, carH * 0.38);
+    // Across bottom
+    ctx.lineTo(-carW * 0.42, carH * 0.38);
+    // Up left fender flare
+    ctx.lineTo(-carW * 0.48, carH * 0.28);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Body shading gradient
+    const bodyShade = ctx.createLinearGradient(0, -carH * 0.1, 0, carH * 0.4);
+    bodyShade.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
+    bodyShade.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+    ctx.fillStyle = bodyShade;
+    ctx.fill();
+
+    // F. Continuous Neon Laser Taillight Bar
+    const lightW = carW * 0.76;
+    const lightH = 14 * scale;
+    const lightY = carH * 0.12;
+
+    // Glowing red housing
+    ctx.fillStyle = '#2b090c';
+    ctx.fillRect(-lightW / 2, lightY, lightW, lightH);
+
+    // Neon laser red LED strip
+    ctx.fillStyle = '#ff1a38';
+    ctx.shadowColor = '#ff1a38';
+    ctx.shadowBlur = 18 * scale;
+    ctx.fillRect(-lightW / 2 + 4, lightY + 2, lightW - 8, lightH - 4);
+    ctx.shadowBlur = 0; // reset blur
+
+    // Bright core white flare
+    ctx.fillStyle = '#ffeedd';
+    ctx.fillRect(-lightW / 2 + 10, lightY + 4, lightW - 20, 3 * scale);
+
+    // Center illuminated RONN logo
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${Math.floor(10 * scale)}px "Press Start 2P", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('RONN', 0, lightY + lightH * 0.5);
+
+    // G. Sleek Cabin & Sloping Rear Windshield (Green/Cyan Sky Tint)
+    const cabinW = carW * 0.55;
+    const roofW = carW * 0.4;
+    const cabinTopY = -carH * 0.42;
+    const cabinBaseY = -carH * 0.08;
+
+    // Cabin roof & pillars
+    ctx.fillStyle = trimColor;
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-cabinW / 2, cabinBaseY);
+    ctx.lineTo(-roofW / 2, cabinTopY);
+    ctx.lineTo(roofW / 2, cabinTopY);
+    ctx.lineTo(cabinW / 2, cabinBaseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Rear Windshield Glass with Horizon Reflection
+    const glassGrad = ctx.createLinearGradient(0, cabinTopY, 0, cabinBaseY);
+    glassGrad.addColorStop(0, '#00f5ff');
+    glassGrad.addColorStop(0.5, '#0a1d30');
+    glassGrad.addColorStop(1, '#050a12');
+
+    ctx.fillStyle = glassGrad;
+    ctx.beginPath();
+    ctx.moveTo(-cabinW * 0.45, cabinBaseY - 2);
+    ctx.lineTo(-roofW * 0.44, cabinTopY + 5 * scale);
+    ctx.lineTo(roofW * 0.44, cabinTopY + 5 * scale);
+    ctx.lineTo(cabinW * 0.45, cabinBaseY - 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Engine bay louvers on sloped rear window
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2.5;
+    for (let l = 1; l <= 4; l++) {
+      const ly = cabinTopY + ((cabinBaseY - cabinTopY) * l) / 5;
+      const lw = roofW * 0.45 + (cabinW * 0.45 - roofW * 0.45) * (l / 5);
+      ctx.beginPath();
+      ctx.moveTo(-lw, ly);
+      ctx.lineTo(lw, ly);
+      ctx.stroke();
+    }
+
+    // H. Massive Floating Carbon GT Wing Spoiler
+    const wingW = carW * 0.88;
+    const wingY = -carH * 0.38;
+    const strutBaseY = -carH * 0.06;
+
+    // Dual vertical spoiler mounts
+    [-carW * 0.25, carW * 0.25].forEach((sx) => {
       ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 3.5;
+      ctx.lineWidth = 4 * scale;
       ctx.beginPath();
-      ctx.moveTo(dL.x, dL.y);
-      ctx.lineTo(wL.x, wL.y);
-      ctx.moveTo(dR.x, dR.y);
-      ctx.lineTo(wR.x, wR.y);
+      ctx.moveTo(sx, strutBaseY);
+      ctx.lineTo(sx * 1.05, wingY);
       ctx.stroke();
+    });
 
-      // Main Carbon Wing Blade
-      ctx.strokeStyle = accentCol;
-      ctx.lineWidth = 6 * baseScale;
-      ctx.beginPath();
-      ctx.moveTo(wL.x - 8, wL.y);
-      ctx.lineTo(wR.x + 8, wR.y);
-      ctx.stroke();
-    }
+    // Main carbon wing blade
+    ctx.fillStyle = trimColor;
+    ctx.strokeStyle = isEmber ? '#ff7a29' : '#00f5ff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.roundRect(-wingW / 2, wingY - 6 * scale, wingW, 12 * scale, 3 * scale);
+    ctx.fill();
+    ctx.stroke();
 
-    // 5. Headlight Projector Light Beams (when viewed from front)
-    if (Math.abs(camYaw) > 1.8) {
-      const fL = projected[0];
-      const fR = projected[1];
-      if (fL && fR) {
-        // Pop-up headlights pods
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(fL.x - 12, fL.y - 14, 24, 12);
-        ctx.fillRect(fR.x - 12, fR.y - 14, 24, 12);
+    // Aerodynamic endplates on spoiler tips
+    [-wingW / 2, wingW / 2].forEach((ex) => {
+      ctx.fillStyle = bodyColor;
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.fillRect(ex - 3 * scale, wingY - 14 * scale, 6 * scale, 24 * scale);
+      ctx.strokeRect(ex - 3 * scale, wingY - 14 * scale, 6 * scale, 24 * scale);
+    });
 
-        // Huge forward beam cones illuminating asphalt
-        const beamGradL = ctx.createLinearGradient(fL.x, fL.y, fL.x - 220, fL.y + 160);
-        beamGradL.addColorStop(0, 'rgba(255, 255, 240, 0.45)');
-        beamGradL.addColorStop(1, 'transparent');
-        ctx.fillStyle = beamGradL;
-        ctx.beginPath();
-        ctx.moveTo(fL.x, fL.y);
-        ctx.lineTo(fL.x - 240, fL.y + 180);
-        ctx.lineTo(fL.x + 60, fL.y + 180);
-        ctx.closePath();
-        ctx.fill();
-
-        const beamGradR = ctx.createLinearGradient(fR.x, fR.y, fR.x + 220, fR.y + 160);
-        beamGradR.addColorStop(0, 'rgba(255, 255, 240, 0.45)');
-        beamGradR.addColorStop(1, 'transparent');
-        ctx.fillStyle = beamGradR;
-        ctx.beginPath();
-        ctx.moveTo(fR.x, fR.y);
-        ctx.lineTo(fR.x - 60, fR.y + 180);
-        ctx.lineTo(fR.x + 240, fR.y + 180);
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
-
-    // 6. Taillight Glow & Twin Exhaust Flames (when viewed from rear)
-    if (Math.abs(camYaw) < 1.1) {
-      const rL = projected[12];
-      const rR = projected[13];
-      if (rL && rR) {
-        // Red LED lightbar glow
-        ctx.strokeStyle = '#ff2244';
-        ctx.lineWidth = 5 * baseScale;
-        ctx.beginPath();
-        ctx.moveTo(rL.x, rL.y - 4);
-        ctx.lineTo(rR.x, rR.y - 4);
-        ctx.stroke();
-
-        // Twin exhaust flame bursts
-        const flameLen = 25 + Math.sin(this.time * 60) * 15;
-        ctx.fillStyle = 'rgba(255, 120, 20, 0.85)';
-        ctx.beginPath();
-        ctx.moveTo(rL.x + 10, rL.y + 4);
-        ctx.lineTo(rL.x + 15, rL.y + flameLen);
-        ctx.lineTo(rL.x + 20, rL.y + 4);
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(rR.x - 20, rR.y + 4);
-        ctx.lineTo(rR.x - 15, rR.y + flameLen);
-        ctx.lineTo(rR.x - 10, rR.y + 4);
-        ctx.fill();
-      }
-    }
+    ctx.restore();
   }
 }
