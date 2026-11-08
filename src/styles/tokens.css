@@ -1,0 +1,51 @@
+/* ===  Design tokens  === */
+/* Two themes: paper (light) and ember (dark orange) */
+/* Applied via data-theme attribute on <html> */
+
+:root,
+[data-theme='paper'] {
+  --bg-page: #D9D8D2;
+  --bg-window: #F2F1EC;
+  --bg-dock: #D9D8D2;
+  --ink: #000000;
+  --muted: #4A4A46;
+  --accent: #2430FF;
+  --frame: #000000;
+  --line: #000000;
+  --bar-bg: #000000;
+  --bar-ink: #F2F1EC;
+  --chip-bg: #F2F1EC;
+  --chip-ink: #000000;
+  --chip-border: #000000;
+  --chip-active-bg: #000000;
+  --chip-active-ink: #F2F1EC;
+  --row-hover: #E6E5DF;
+  --placeholder: #5A5A55;
+  --focus: #2430FF;
+
+  color-scheme: light;
+}
+
+[data-theme='ember'] {
+  --bg-page: #120C08;
+  --bg-window: #1F150F;
+  --bg-dock: #150E09;
+  --ink: #EFE3D3;
+  --muted: #B9A794;
+  --accent: #E07B39;
+  --frame: #E07B39;
+  --line: #8A6A50;
+  --bar-bg: #E07B39;
+  --bar-ink: #1F150F;
+  --chip-bg: #1F150F;
+  --chip-ink: #EFE3D3;
+  --chip-border: #EFE3D3;
+  --chip-active-bg: #E07B39;
+  --chip-active-ink: #1F150F;
+  --row-hover: #2B1E15;
+  --placeholder: #A89580;
+  --focus: #F2B27A;
+
+  color-scheme: dark;
+}
+

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="id" class="no-js">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ronnproject.my.id — Creative Technologist</title>
+    <meta name="description" content="Hub personal Ronn. Mahasiswa Teknik Komputer, Polmed. Membangun sistem dan merancang tampilannya." />
+    <link rel="canonical" href="https://ronnproject.my.id" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="ronnproject.my.id — Creative Technologist" />
+    <meta property="og:description" content="Hub personal Ronn. Mahasiswa Teknik Komputer, Polmed. Membangun sistem dan merancang tampilannya." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ronnproject.my.id" />
+    <meta property="og:image" content="https://ronnproject.my.id/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ronnproject.my.id — Creative Technologist" />
+    <meta name="twitter:description" content="Hub personal Ronn. Mahasiswa Teknik Komputer, Polmed. Membangun sistem dan merancang tampilannya." />
+    <meta name="twitter:image" content="https://ronnproject.my.id/og-image.png" />
+
+    <!-- Prevent theme flash: read localStorage before first paint -->
+    <script>
+      (function(){
+        document.documentElement.classList.remove('no-js');
+        var t='paper';
+        try{
+          var s=localStorage.getItem('theme');
+          if(s==='paper'||s==='ember')t=s;
+          else if(matchMedia('(prefers-color-scheme:dark)').matches)t='ember';
+        }catch(e){
+          if(matchMedia('(prefers-color-scheme:dark)').matches)t='ember';
+        }
+        document.documentElement.dataset.theme=t;
+      })();
+    </script>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="terminal" class="terminal-window">
+      <!-- Header bar -->
+      <header class="terminal-header">
+        <span class="header-domain">ronnproject.my.id</span>
+        <span class="key-hints">tab lengkapi · ↑ ↓ riwayat · esc kembali</span>
+      </header>
+
+      <!-- Terminal body (scrolling history area) -->
+      <main class="terminal-body">
+        <!-- Wordmark and intro (static HTML for SEO + noscript) -->
+        <h1 class="wordmark">ronnproject</h1>
+        <p class="intro-text">Mahasiswa Teknik Komputer, Polmed. Membangun sistem dan merancang tampilannya.</p>
+
+        <!-- Output area (JS appends command output here) -->
+        <div class="output-area" role="log" aria-label="Terminal output"></div>
+      </main>
+
+      <!-- Docked bottom block: prompt line + chips -->
+      <footer class="terminal-dock">
+        <div class="input-area">
+          <label for="terminal-input" class="input-prompt">ronn@project:~$&nbsp;</label>
+          <span class="input-cursor" aria-hidden="true"></span>
+          <input
+            type="text"
+            id="terminal-input"
+            class="terminal-input"
+            placeholder="ketik help"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+          />
+        </div>
+        <nav class="chip-bar" aria-label="Command shortcuts">
+          <span class="chip-bar-label">ketuk untuk menjalankan</span>
+          <button class="chip" type="button" data-command="help">help</button>
+          <button class="chip" type="button" data-command="about">about</button>
+          <button class="chip" type="button" data-command="projects">projects</button>
+          <button class="chip" type="button" data-command="contact">contact</button>
+          <button class="chip" type="button" data-command="theme">theme</button>
+          <button class="chip" type="button" data-command="clear">clear</button>
+        </nav>
+      </footer>
+
+      <!-- ARIA live region for screen reader announcements -->
+      <div class="sr-live sr-only" aria-live="polite" aria-atomic="false"></div>
+    </div>
+
+    <!-- Noscript fallback for search crawlers and JS-disabled browsers -->
+    <noscript>
+      <div class="noscript-fallback">
+        <h2>Daftar Project</h2>
+        <ul>
+          <li><a href="https://kelas-f.ronnproject.my.id">kelas-f</a> — Website Kelas F Teknik Komputer, Polmed.</li>
+          <li><a href="https://ronn-ai.ronnproject.my.id">ronn-ai</a> — Dashboard untuk bot WhatsApp: Public Deck dan Mission Control.</li>
+          <li><a href="https://ronnbot.ronnproject.my.id">ronnbot</a> — Ekosistem bot WhatsApp modular berbasis Node.js.</li>
+          <li><a href="https://squad-x.ronnproject.my.id">squad-x</a> — Pengalaman web sinematik dengan scroll, dibangun di React.</li>
+        </ul>
+
+        <h2>Kontak</h2>
+        <ul>
+          <li><a href="https://instagram.com/ronnlbtrn_" rel="noopener noreferrer">Instagram @ronnlbtrn_</a></li>
+          <li><a href="mailto:contact@ronnproject.my.id">Email: contact@ronnproject.my.id</a></li>
+        </ul>
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
