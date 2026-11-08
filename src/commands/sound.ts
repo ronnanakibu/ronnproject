@@ -6,6 +6,7 @@ export const soundCommand: Command = {
   aliases: ['audio', 'sfx', 'mute'],
   description: 'Nyalakan atau matikan efek suara retro 8-bit.',
   usage: 'sound [on|off]',
+  hidden: true,
   complete(partial: string): string[] {
     return ['on', 'off'].filter((s) => s.startsWith(partial.toLowerCase()));
   },
@@ -36,3 +37,4 @@ export const soundCommand: Command = {
     };
   },
 };
+

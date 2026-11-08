@@ -64,6 +64,7 @@ export interface Command {
   aliases?: string[];
   description: string;
   usage?: string;
+  hidden?: boolean;
   complete?: (partial: string) => string[];
   run(ctx: Context, args: string[]): OutputBlock | OutputBlock[] | void;
 }

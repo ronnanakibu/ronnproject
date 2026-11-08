@@ -5,6 +5,7 @@ export const driveCommand: Command = {
   aliases: ['attract', 'forza', 'screensaver'],
   description: 'Masuk ke 3D cinematic retro-arcade attract mode.',
   usage: 'drive',
+  hidden: true,
   run(ctx, _args): OutputBlock {
     if (ctx.startScreensaver) {
       setTimeout(() => {

@@ -6,7 +6,7 @@ export const helpCommand: Command = {
   aliases: ['h', '?'],
   description: 'Tampilkan daftar perintah yang tersedia.',
   run(_ctx, _args): OutputBlock[] {
-    const commands = getAllCommands();
+    const commands = getAllCommands().filter((cmd) => !cmd.hidden);
     const blocks: OutputBlock[] = [
       { type: 'text', content: 'perintah yang tersedia:' },
     ];

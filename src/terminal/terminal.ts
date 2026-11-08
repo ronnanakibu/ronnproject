@@ -55,7 +55,7 @@ function isTouchDevice(): boolean {
 export function mountTerminal(root: HTMLElement): void {
   const history = new History();
   const commandMap = getCommandMap();
-  const commandNames = getCommandNames();
+  const commandNames = getCommandNames().filter((name) => !getCommand(name)?.hidden);
   const screensaver = new ScreensaverEngine(15); // 15s idle timer
 
   // === Query DOM elements ===

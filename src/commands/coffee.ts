@@ -5,6 +5,7 @@ export const coffeeCommand: Command = {
   aliases: ['coffee', 'ngopi'],
   description: 'Bahan bakar utama creative engineering.',
   usage: 'kopi',
+  hidden: true,
   run(_ctx, _args): OutputBlock[] {
     return [
       {
@@ -26,3 +27,4 @@ Rekomendasi   : Kopi hitam tubruk + mie instan kuah double telur.`,
     ];
   },
 };
+

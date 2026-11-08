@@ -5,6 +5,7 @@ export const quoteCommand: Command = {
   aliases: ['quote', 'quotes'],
   description: 'Kutipan filosofi hidup Ronn.',
   usage: 'katakata',
+  hidden: true,
   run(_ctx, _args): OutputBlock[] {
     return [
       {
@@ -19,3 +20,4 @@ export const quoteCommand: Command = {
     ];
   },
 };
+
