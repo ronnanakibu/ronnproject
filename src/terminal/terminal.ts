@@ -4,9 +4,10 @@ import { History } from './history.js';
 import { complete } from './complete.js';
 import { renderBlock } from './render.js';
 import { ScreensaverEngine } from './screensaver.js';
+import { soundFx } from './audio.js';
 import { getCommand, getCommandMap, getCommandNames } from '../commands/index.js';
 
-const VALID_THEMES = ['paper', 'ember'] as const;
+const VALID_THEMES = ['paper', 'ember', 'matrix'] as const;
 type ThemeName = (typeof VALID_THEMES)[number];
 
 function isValidTheme(name: string): name is ThemeName {
@@ -133,6 +134,7 @@ export function mountTerminal(root: HTMLElement): void {
     // Look up the command
     const cmd = getCommand(parsed.name);
     if (!cmd) {
+      soundFx.playError();
       ctx.print({
         type: 'text',
         content: `perintah "${parsed.name}" tidak ada. Ketik help untuk daftar perintah.`,
@@ -140,6 +142,8 @@ export function mountTerminal(root: HTMLElement): void {
       });
       return;
     }
+
+    soundFx.playEnter();
 
     // Run the command
     const result = cmd.run(ctx, parsed.args);
@@ -181,6 +185,11 @@ export function mountTerminal(root: HTMLElement): void {
 
   // === Input handling ===
   inputEl.addEventListener('keydown', (e: KeyboardEvent) => {
+    // Play retro typing click for standard characters
+    if (e.key.length === 1 || e.key === 'Backspace') {
+      soundFx.playKeypress();
+    }
+
     switch (e.key) {
       case 'Enter': {
         const value = inputEl.value;
@@ -270,6 +279,42 @@ export function mountTerminal(root: HTMLElement): void {
     }
     if (!isTouchDevice()) {
       inputEl.focus();
+    }
+  });
+
+  // === Konami Code Easter Egg (↑ ↑ ↓ ↓ ← → ← → B A) ===
+  const konamiSequence = [
+    'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+    'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+    'b', 'a'
+  ];
+  let konamiIndex = 0;
+
+  window.addEventListener('keydown', (e: KeyboardEvent) => {
+    const key = e.key.toLowerCase() === 'b' ? 'b' : e.key.toLowerCase() === 'a' ? 'a' : e.key;
+    if (key === konamiSequence[konamiIndex]) {
+      konamiIndex++;
+      if (konamiIndex === konamiSequence.length) {
+        konamiIndex = 0;
+        soundFx.playPowerUp();
+        ctx.setTheme('matrix');
+
+        ctx.print([
+          {
+            type: 'text',
+            content: '🎮 [KONAMI CODE ACCEPTED!]',
+            class: 'prompt-text',
+          },
+          {
+            type: 'text',
+            content: '⚡ 99 LIVES & GOD MODE ACTIVATED!\n🔓 Secret Theme "matrix" Berhasil Dibuka!',
+            class: 'prompt-text',
+          },
+        ]);
+      }
+    } else {
+      // If mismatch, reset unless it happens to be the start of sequence
+      konamiIndex = (key === konamiSequence[0]) ? 1 : 0;
     }
   });
 

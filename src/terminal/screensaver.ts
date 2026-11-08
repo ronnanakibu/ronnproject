@@ -50,8 +50,9 @@ export class ScreensaverEngine {
               RPM: <span id="hud-rpm">7600</span> ·
               GEAR: <span id="hud-gear">5</span>
             </span>
+            <span class="hud-controls">KONTROL: [← → / A D] NYETIR · [↑ / W] NITRO</span>
           </div>
-          <div class="screensaver-hint">TEKAN APAPUN ATAU TAP UNTUK KEMBALI KE TERMINAL</div>
+          <button id="btn-exit-screensaver" class="screensaver-hint" type="button">TEKAN ESC ATAU KLIK UNTUK KEMBALI KE TERMINAL</button>
         </div>
       `;
       document.body.appendChild(existingOverlay);
@@ -69,18 +70,66 @@ export class ScreensaverEngine {
   }
 
   private initListeners(): void {
-    const dismiss = () => {
-      if (this.isActive) {
-        this.stop();
-      }
+    const exitBtn = this.overlay.querySelector('#btn-exit-screensaver');
+    exitBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.stop();
       this.resetIdleTimer();
-    };
+    });
 
-    window.addEventListener('keydown', dismiss, { passive: true });
-    window.addEventListener('mousemove', dismiss, { passive: true });
-    window.addEventListener('mousedown', dismiss, { passive: true });
-    window.addEventListener('touchstart', dismiss, { passive: true });
-    window.addEventListener('wheel', dismiss, { passive: true });
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      this.resetIdleTimer();
+
+      if (!this.isActive) return;
+
+      // Interactive Steering & Driving Controls
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        this.carTargetX = Math.max(-0.85, this.carTargetX - 0.28);
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        e.preventDefault();
+        this.carTargetX = Math.min(0.85, this.carTargetX + 0.28);
+        return;
+      }
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+        e.preventDefault();
+        this.speed = Math.min(290, this.speed + 12);
+        return;
+      }
+      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+        e.preventDefault();
+        this.speed = Math.max(160, this.speed - 12);
+        return;
+      }
+
+      // Any other key (Escape, Enter, Space, Q, etc.) exits screensaver
+      this.stop();
+    });
+
+    // Touch controls: tap left side to steer left, tap right side to steer right
+    this.canvas.addEventListener('touchstart', (e: TouchEvent) => {
+      this.resetIdleTimer();
+      if (!this.isActive) return;
+
+      const touch = e.touches[0];
+      if (!touch) return;
+
+      const screenW = window.innerWidth;
+      if (touch.clientX < screenW * 0.45) {
+        this.carTargetX = Math.max(-0.85, this.carTargetX - 0.35);
+      } else if (touch.clientX > screenW * 0.55) {
+        this.carTargetX = Math.min(0.85, this.carTargetX + 0.35);
+      } else {
+        // Tap middle to boost
+        this.speed = Math.min(290, this.speed + 15);
+      }
+    }, { passive: true });
+
+    window.addEventListener('mousemove', () => this.resetIdleTimer(), { passive: true });
+    window.addEventListener('mousedown', () => this.resetIdleTimer(), { passive: true });
+    window.addEventListener('wheel', () => this.resetIdleTimer(), { passive: true });
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {

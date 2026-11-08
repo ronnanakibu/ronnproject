@@ -1,6 +1,6 @@
 import type { Command, OutputBlock } from '../terminal/types.js';
 
-const VALID_THEMES = ['paper', 'ember'] as const;
+const VALID_THEMES = ['paper', 'ember', 'matrix'] as const;
 type ThemeName = (typeof VALID_THEMES)[number];
 
 function isValidTheme(name: string): name is ThemeName {
@@ -9,8 +9,8 @@ function isValidTheme(name: string): name is ThemeName {
 
 export const themeCommand: Command = {
   name: 'theme',
-  description: 'Ganti atau lihat tema (paper / ember).',
-  usage: 'theme [paper|ember]',
+  description: 'Ganti atau lihat tema (paper / ember / matrix).',
+  usage: 'theme [paper|ember|matrix]',
   complete(partial: string): string[] {
     return VALID_THEMES.filter((t) => t.startsWith(partial.toLowerCase()));
   },
@@ -31,7 +31,7 @@ export const themeCommand: Command = {
     if (!isValidTheme(themeName)) {
       return {
         type: 'text',
-        content: `tema "${themeName}" tidak ada. Pilih: paper atau ember.`,
+        content: `tema "${themeName}" tidak ada. Pilih: paper, ember, atau matrix.`,
         class: 'error',
       };
     }

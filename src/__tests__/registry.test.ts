@@ -12,6 +12,10 @@ describe('Command Registry', () => {
     expect(names).toContain('theme');
     expect(names).toContain('clear');
     expect(names).toContain('drive');
+    expect(names).toContain('sudo');
+    expect(names).toContain('katakata');
+    expect(names).toContain('kopi');
+    expect(names).toContain('sound');
   });
 
   it('looks up commands by name', () => {

@@ -73,6 +73,25 @@ describe('Theme Contrast Ratios (WCAG 2.1 AA >= 4.5:1 for body text)', () => {
     placeholder: '#A89580',
   };
 
+  const matrix = {
+    bgPage: '#050E07',
+    bgWindow: '#09160C',
+    bgDock: '#050E07',
+    ink: '#00FF66',
+    muted: '#00A843',
+    accent: '#00FF66',
+    frame: '#00FF66',
+    line: '#007A30',
+    barBg: '#00FF66',
+    barInk: '#050E07',
+    chipBg: '#09160C',
+    chipInk: '#00FF66',
+    chipBorder: '#00FF66',
+    chipActiveBg: '#00FF66',
+    chipActiveInk: '#050E07',
+    placeholder: '#008A38',
+  };
+
   describe('Paper theme (Light)', () => {
     it('primary text (ink) on window background >= 4.5:1', () => {
       const ratio = contrastRatio(paper.ink, paper.bgWindow);
@@ -153,6 +172,28 @@ describe('Theme Contrast Ratios (WCAG 2.1 AA >= 4.5:1 for body text)', () => {
 
     it('muted text on dock background >= 4.5:1', () => {
       const ratio = contrastRatio(ember.muted, ember.bgDock);
+      expect(ratio).toBeGreaterThanOrEqual(4.5);
+    });
+  });
+
+  describe('Matrix theme (Secret Hacker Green)', () => {
+    it('primary text (ink) on window background >= 4.5:1', () => {
+      const ratio = contrastRatio(matrix.ink, matrix.bgWindow);
+      expect(ratio).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it('accent link/prompt color on window background >= 4.5:1', () => {
+      const ratio = contrastRatio(matrix.accent, matrix.bgWindow);
+      expect(ratio).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it('header bar text on header background >= 4.5:1', () => {
+      const ratio = contrastRatio(matrix.barInk, matrix.barBg);
+      expect(ratio).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it('chip text on chip background >= 4.5:1', () => {
+      const ratio = contrastRatio(matrix.chipInk, matrix.chipBg);
       expect(ratio).toBeGreaterThanOrEqual(4.5);
     });
   });

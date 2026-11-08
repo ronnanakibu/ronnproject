@@ -49,3 +49,27 @@
   color-scheme: dark;
 }
 
+/* Secret Easter Egg Theme: Matrix Green Phosphor */
+[data-theme='matrix'] {
+  --bg-page: #050E07;
+  --bg-window: #09160C;
+  --bg-dock: #050E07;
+  --ink: #00FF66;
+  --muted: #00A843;
+  --accent: #00FF66;
+  --frame: #00FF66;
+  --line: #007A30;
+  --bar-bg: #00FF66;
+  --bar-ink: #050E07;
+  --chip-bg: #09160C;
+  --chip-ink: #00FF66;
+  --chip-border: #00FF66;
+  --chip-active-bg: #00FF66;
+  --chip-active-ink: #050E07;
+  --row-hover: #0F2615;
+  --placeholder: #008A38;
+  --focus: #00FF66;
+
+  color-scheme: dark;
+}
+

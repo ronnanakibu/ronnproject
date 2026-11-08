@@ -7,6 +7,10 @@ import { openCommand } from './open.js';
 import { themeCommand } from './theme.js';
 import { clearCommand } from './clear.js';
 import { driveCommand } from './drive.js';
+import { sudoCommand } from './sudo.js';
+import { quoteCommand } from './quote.js';
+import { coffeeCommand } from './coffee.js';
+import { soundCommand } from './sound.js';
 
 const allCommands: Command[] = [
   helpCommand,
@@ -15,8 +19,12 @@ const allCommands: Command[] = [
   contactCommand,
   openCommand,
   themeCommand,
-  clearCommand,
   driveCommand,
+  quoteCommand,
+  coffeeCommand,
+  soundCommand,
+  sudoCommand,
+  clearCommand,
 ];
 
 // Map from name/alias -> Command for O(1) lookup

@@ -29,7 +29,7 @@
         var t='paper';
         try{
           var s=localStorage.getItem('theme');
-          if(s==='paper'||s==='ember')t=s;
+          if(s==='paper'||s==='ember'||s==='matrix')t=s;
           else if(matchMedia('(prefers-color-scheme:dark)').matches)t='ember';
         }catch(e){
           if(matchMedia('(prefers-color-scheme:dark)').matches)t='ember';
@@ -84,6 +84,7 @@
           <button class="chip pixel-btn" type="button" data-command="projects">PROJECTS</button>
           <button class="chip pixel-btn" type="button" data-command="contact">CONTACT</button>
           <button class="chip pixel-btn" type="button" data-command="theme">THEME</button>
+          <button class="chip pixel-btn" type="button" data-command="sound">SFX</button>
           <button class="chip pixel-btn pixel-btn-accent" type="button" data-command="drive">DRIVE 3D</button>
           <button class="chip pixel-btn" type="button" data-command="clear">CLEAR</button>
         </nav>
