@@ -19,7 +19,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ronnproject.my.id — Creative Technologist" />
-    <meta name="twitter:description" content="Hub personal Ronn. Mahasiswa Teknik Komputer, Polmed. Membangun sistem dan merancang tampilannya." />
+    <meta name="twitter:description" content="Hub personal Ronn. Mahasiswa Teknik Komputer, Polmed." />
     <meta name="twitter:image" content="https://ronnproject.my.id/og-image.png" />
 
     <!-- Prevent theme flash: read localStorage before first paint -->
@@ -41,18 +41,22 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-    <div id="terminal" class="terminal-window">
-      <!-- Header bar -->
-      <header class="terminal-header">
-        <span class="header-domain">ronnproject.my.id</span>
-        <span class="key-hints">tab lengkapi · ↑ ↓ riwayat · esc kembali</span>
+    <div id="terminal" class="terminal-window pixel-gui">
+      <!-- Retro Arcade Header bar -->
+      <header class="terminal-header pixel-hud">
+        <div class="hud-left"><span class="hud-blink">●</span> 1P READY</div>
+        <div class="hud-center header-domain">ronnproject.my.id</div>
+        <div class="hud-right key-hints">CREDITS 99 · STAGE 01</div>
       </header>
 
       <!-- Terminal body (scrolling history area) -->
       <main class="terminal-body">
-        <!-- Wordmark and intro (static HTML for SEO + noscript) -->
-        <h1 class="wordmark">ronnproject</h1>
-        <p class="intro-text">Mahasiswa Teknik Komputer, Polmed. Membangun sistem dan merancang tampilannya.</p>
+        <!-- Pixel Wordmark and intro -->
+        <div class="hero-header">
+          <h1 class="wordmark pixel-title">RONNPROJECT</h1>
+          <div class="arcade-subtag">[ CREATIVE TECHNOLOGIST // INSERT DISK ]</div>
+          <p class="intro-text">Mahasiswa Teknik Komputer, Polmed. Membangun sistem dan merancang tampilannya.</p>
+        </div>
 
         <!-- Output area (JS appends command output here) -->
         <div class="output-area" role="log" aria-label="Terminal output"></div>
@@ -61,27 +65,27 @@
       <!-- Docked bottom block: prompt line + chips -->
       <footer class="terminal-dock">
         <div class="input-area">
-          <label for="terminal-input" class="input-prompt">ronn@project:~$&nbsp;</label>
-          <span class="input-cursor" aria-hidden="true"></span>
+          <label for="terminal-input" class="input-prompt">ronn@arcade:~$ </label>
+          <span class="input-cursor" aria-hidden="true">█</span>
           <input
             type="text"
             id="terminal-input"
             class="terminal-input"
-            placeholder="ketik help"
+            placeholder="ketik help atau pilih tombol..."
             autocomplete="off"
             autocapitalize="none"
             spellcheck="false"
           />
         </div>
         <nav class="chip-bar" aria-label="Command shortcuts">
-          <span class="chip-bar-label">ketuk untuk menjalankan</span>
-          <button class="chip" type="button" data-command="help">help</button>
-          <button class="chip" type="button" data-command="about">about</button>
-          <button class="chip" type="button" data-command="projects">projects</button>
-          <button class="chip" type="button" data-command="contact">contact</button>
-          <button class="chip" type="button" data-command="theme">theme</button>
-          <button class="chip" type="button" data-command="drive">drive</button>
-          <button class="chip" type="button" data-command="clear">clear</button>
+          <span class="chip-bar-label">ACTION:</span>
+          <button class="chip pixel-btn" type="button" data-command="help">HELP</button>
+          <button class="chip pixel-btn" type="button" data-command="about">ABOUT</button>
+          <button class="chip pixel-btn" type="button" data-command="projects">PROJECTS</button>
+          <button class="chip pixel-btn" type="button" data-command="contact">CONTACT</button>
+          <button class="chip pixel-btn" type="button" data-command="theme">THEME</button>
+          <button class="chip pixel-btn pixel-btn-accent" type="button" data-command="drive">DRIVE 3D</button>
+          <button class="chip pixel-btn" type="button" data-command="clear">CLEAR</button>
         </nav>
       </footer>
 
